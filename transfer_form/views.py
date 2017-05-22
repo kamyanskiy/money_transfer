@@ -35,7 +35,8 @@ class TransferView(generic.View):
             recipient_objs = Person.objects.filter(
                 ssn__in=recipient_ssns).exclude(ssn=sender.ssn)
 
-            if sender.balance.amount >= transfer_amount:
+            if (recipient_objs.count() > 0
+                    and sender.balance.amount >= transfer_amount):
                 paid_sum = sender.balance.amount - transfer_amount
                 sender.balance.amount = paid_sum
                 sender.save()
