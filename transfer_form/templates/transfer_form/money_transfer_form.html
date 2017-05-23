@@ -1,17 +1,13 @@
 {% extends "transfer_form/base.html" %}
 
 {% block content %}
-<div class="col-md-3">
+
 <div class="form-area">
-    <br/>
-    <h3 >Денежный перевод</h3>
+    <h3 class="form-title">Денежный перевод</h3>
     <form action="." method="post" class="form-horizontal">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" id="btnSubmit" name="submit" class="btn btn-primary pull-right btn-send" value="submit"> Перевести </button>
+        <button type="submit" id="btnSubmit" name="submit" class="btn-send" value="submit"> Перевести </button>
     </form>
-
-
-</div>
 </div>
 {% endblock %}

@@ -1,17 +1,11 @@
-from django.shortcuts import render, redirect
+import json
+
+from django.http import HttpResponse
+from django.shortcuts import render
 from django.views import generic
-from django.urls import reverse_lazy
 
 from .forms import TransferForm
 from .models import Person
-
-
-class SuccessView(generic.TemplateView):
-    template_name = "transfer_form/thanks.html"
-
-
-class ErrorView(generic.TemplateView):
-    template_name = "transfer_form/error.html"
 
 
 class TransferView(generic.View):
@@ -35,8 +29,16 @@ class TransferView(generic.View):
             recipient_objs = Person.objects.filter(
                 ssn__in=recipient_ssns).exclude(ssn=sender.ssn)
 
-            if (recipient_objs.count() > 0
-                    and sender.balance.amount >= transfer_amount):
+            if not recipient_objs.count():
+                data = {
+                    "title": "Ошибка транзакции",
+                    "message": "Не найдены получатели.",
+                    "status": "error"
+                }
+                return HttpResponse(json.dumps(data),
+                                    content_type="application/json")
+
+            if sender.balance.amount >= transfer_amount:
                 paid_sum = sender.balance.amount - transfer_amount
                 sender.balance.amount = paid_sum
                 sender.save()
@@ -45,10 +47,26 @@ class TransferView(generic.View):
                     rcp_balance = recipient.balance.amount + recipient_sum
                     recipient.balance.amount = rcp_balance
                     recipient.save()
+                data = {
+                    "title": "Успешно",
+                    "message": "Транзакция проведена успешно.",
+                    "status": "information"
+                }
+                return HttpResponse(json.dumps(data),
+                                    content_type="application/json")
             else:
-                return redirect(reverse_lazy('error'))
+                data = {
+                    "title": "Ошибка транзакции",
+                    "message": "Недостаточно средств на счету.",
+                    "status": "error"
+                }
+                return HttpResponse(json.dumps(data),
+                                    content_type="application/json")
 
-            return redirect(reverse_lazy('success'))
-
-        return render(request, self.template_name, {'form': form})
-
+        data = {
+            "title": "Ошибка транзакции",
+            "message": "Невозможно выполнить запрос.",
+            "status": "error"
+        }
+        return HttpResponse(json.dumps(data),
+                            content_type="application/json")
