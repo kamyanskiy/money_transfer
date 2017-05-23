@@ -10,3 +10,15 @@ Demo: https://vast-fortress-77127.herokuapp.com/transfer_form/
 
 Django admin: (admin/adminadmin1)
 https://vast-fortress-77127.herokuapp.com/admin/
+
+To run tests:
+
+```
+$ python manage.py test
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.097s
+
+OK
+
+```
