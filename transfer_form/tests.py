@@ -9,7 +9,6 @@ from .models import Person
 
 
 class TransferFormTest(TestCase):
-
     def setUp(self):
         self.user1, created = User.objects.get_or_create(username="Test",
                                                          first_name="TestF",
@@ -29,12 +28,12 @@ class TransferFormTest(TestCase):
 
     def test_transfer_success(self):
         data = {
-                "sender": self.person1.id,
-                "recipients_list": self.person2.ssn,
-                "amount": Decimal(5)
-                }
+            "sender": self.person1.id,
+            "recipients_list": self.person2.ssn,
+            "amount": Decimal(5)
+        }
         response = self.client.post(reverse_lazy("transfer_form"),
-                         data=data)
+                                    data=data)
         assert_that(response.json(),
                     is_(equal_to({'status': 'information',
                                   'title': 'Успешно',
@@ -42,12 +41,12 @@ class TransferFormTest(TestCase):
 
     def test_recipients_not_found(self):
         data = {
-                "sender": self.person1.id,
-                "recipients_list": "wrong recipient ssn",
-                "amount": Decimal(5)
-                }
+            "sender": self.person1.id,
+            "recipients_list": "wrong recipient ssn",
+            "amount": Decimal(5)
+        }
         response = self.client.post(reverse_lazy("transfer_form"),
-                         data=data)
+                                    data=data)
         assert_that(response.json(),
                     is_(equal_to({'title': 'Ошибка транзакции',
                                   'status': 'error',
@@ -55,12 +54,12 @@ class TransferFormTest(TestCase):
 
     def test_insufficient_amount(self):
         data = {
-                "sender": self.person1.id,
-                "recipients_list": self.person2.ssn,
-                "amount": Decimal(1000)
-                }
+            "sender": self.person1.id,
+            "recipients_list": self.person2.ssn,
+            "amount": Decimal(1000)
+        }
         response = self.client.post(reverse_lazy("transfer_form"),
-                         data=data)
+                                    data=data)
         assert_that(response.json(),
                     is_(equal_to({'title': 'Ошибка транзакции',
                                   'status': 'error',
@@ -68,12 +67,12 @@ class TransferFormTest(TestCase):
 
     def test_form_serialization_failed(self):
         data = {
-                "sender": self.person1.id,
-                "recipients_list": self.person2.ssn,
-                # we send not full data
-                }
+            "sender": self.person1.id,
+            "recipients_list": self.person2.ssn,
+            # we send not full data
+        }
         response = self.client.post(reverse_lazy("transfer_form"),
-                         data=data)
+                                    data=data)
         assert_that(response.json(),
                     is_(equal_to({'title': 'Ошибка транзакции',
                                   'status': 'error',
